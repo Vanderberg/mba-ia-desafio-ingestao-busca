@@ -1,22 +1,12 @@
-import os
-from dotenv import load_dotenv
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_openai import OpenAIEmbeddings
-from langchain_google_genai import GoogleGenerativeAIEmbeddings
 
 from langchain_core.documents import Document
-from langchain_postgres import PGVector
+from database import get_vector_store
 
+from config import config
 
-load_dotenv()
-
-for k in ("OPENAI_API_KEY", "DATABASE_URL","PG_VECTOR_COLLECTION_NAME", "PDF_PATH"):
-    if not os.getenv(k):
-        raise RuntimeError(f"Environment variable {k} is not set")
-
-
-PDF_PATH = os.getenv("PDF_PATH")
+PDF_PATH = config.PDF_PATH
 
 loader = PyPDFLoader(PDF_PATH)
 documents = loader.load()
@@ -43,16 +33,9 @@ enriched = [
 
 ids = [f"doc-{i}" for i in range(len(enriched))]
 
-embeddings = OpenAIEmbeddings(model=os.getenv("OPENAI_MODEL","text-embedding-3-small"))
 
-# embeddings = GoogleGenerativeAIEmbeddings(model=os.getenv("GOOGLE_EMBEDDING_MODEL","models/embedding-001"))
 
-store = PGVector(
-    embeddings=embeddings,
-    collection_name=os.getenv("PG_VECTOR_COLLECTION_NAME"),
-    connection=os.getenv("DATABASE_URL"),
-    use_jsonb=True,
-)
+store = get_vector_store()
 
 store.add_documents(documents=enriched, ids=ids)
 
