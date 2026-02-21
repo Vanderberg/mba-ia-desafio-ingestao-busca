@@ -51,8 +51,6 @@ prompt_do_rag = PromptTemplate(
     input_variables=["resultados concatenados do banco de dados", "pergunta do usuário"]
 )
 
-
-
 chain = prompt_do_rag | llm | StrOutputParser()
 
 def search_prompt(question: str):
@@ -61,8 +59,7 @@ def search_prompt(question: str):
     raise ValueError("Question inválida.")
 
   # Usando o método exigido pelo desafio
-  # resultados_crus = store.similarity_search_with_score(question, k=10)
-  
+  # resultados_crus = store.similarity_search_with_score(question, k=10)  
   resultados_crus = store.similarity_search_with_score(question.strip(), k=10)
   
   textos_recuperados = []
