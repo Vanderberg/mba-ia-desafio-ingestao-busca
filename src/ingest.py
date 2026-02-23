@@ -1,4 +1,5 @@
 import os
+import time
 from dotenv import load_dotenv
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
@@ -47,7 +48,7 @@ provider = os.getenv("ACTIVE_PROVIDER", "openai").lower()
 if provider == "openai":
     embeddings = OpenAIEmbeddings(model=os.getenv("OPENAI_EMBEDDING_MODEL", "text-embedding-3-small"))
 elif provider == "gemini":
-    embeddings = GoogleGenerativeAIEmbeddings(model=os.getenv("GOOGLE_EMBEDDING_MODEL", "models/embedding-001"))
+    embeddings = GoogleGenerativeAIEmbeddings(model=os.getenv("GOOGLE_EMBEDDING_MODEL", "models/gemini-embedding-001"))
 else:
     raise ValueError(f"Provedor {provider} não suportado.")
 
@@ -59,6 +60,17 @@ store = PGVector(
 )
 
 
-store.add_documents(documents=enriched, ids=ids)
+# Ingestão em lotes para evitar erro 429 (Rate Limit) do Gemini
+batch_size = 5
+for i in range(0, len(enriched), batch_size):
+    batch = enriched[i : i + batch_size]
+    batch_ids = ids[i : i + batch_size]
+    
+    print(f"Ingerindo lote {i//batch_size + 1} ({len(batch)} documentos)...")
+    store.add_documents(documents=batch, ids=batch_ids)
+    
+    if i + batch_size < len(enriched):
+        print("Aguardando 2 segundos para respeitar limite de cota...")
+        time.sleep(2)
 
-print("*** Ingestão finalizada com sucesso! Vetores armazenados no Postgres/pgvector. ***")
+print("\n*** Ingestão finalizada com sucesso! Vetores armazenados no Postgres/pgvector. ***")

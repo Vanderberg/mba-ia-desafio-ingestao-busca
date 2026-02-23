@@ -78,6 +78,10 @@ PG_VECTOR_COLLECTION_NAME=pdf_vectors
 PDF_PATH=document.pdf
 ```
 
+> [!IMPORTANT]
+> **Troca de Provedor (OpenAI ↔ Gemini):**
+> Se você alterar o `ACTIVE_PROVIDER` após já ter feito a ingestão de um documento, você **deve** executar o `src/ingest.py` novamente. Isso ocorre porque os modelos de embedding de cada provedor são incompatíveis entre si (geram vetores matemáticos diferentes).
+
 ## 🛠️ Como Executar
 
 ### 1. Subir o Banco de Dados

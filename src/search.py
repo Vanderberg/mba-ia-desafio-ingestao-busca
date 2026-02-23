@@ -41,7 +41,7 @@ if provider == "openai":
     embeddings = OpenAIEmbeddings(model=os.getenv("OPENAI_EMBEDDING_MODEL", "text-embedding-3-small"))
     llm = ChatOpenAI(model="gpt-5-nano", temperature=0.5)
 elif provider == "gemini":
-    embeddings = GoogleGenerativeAIEmbeddings(model=os.getenv("GOOGLE_EMBEDDING_MODEL", "models/embedding-001"))
+    embeddings = GoogleGenerativeAIEmbeddings(model=os.getenv("GOOGLE_EMBEDDING_MODEL", "models/gemini-embedding-001"))
     llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash-lite", temperature=0.5)
 else:
     raise ValueError(f"Provedor {provider} não suportado.")
