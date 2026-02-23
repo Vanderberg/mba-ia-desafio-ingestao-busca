@@ -1,4 +1,4 @@
-# Ingestão e Busca Semântica com LangChain e Postgres
+# Desafio MBA Engenharia de Software com IA - Full Cycle
 
 Este projeto foi desenvolvido como parte do desafio do MBA em Engenharia de Software com IA. O objetivo é criar uma solução capaz de realizar a ingestão de documentos PDF em um banco de dados vetorial (PostgreSQL + pgVector) e permitir a realização de perguntas sobre o conteúdo do documento via interface de linha de comando (CLI).
 

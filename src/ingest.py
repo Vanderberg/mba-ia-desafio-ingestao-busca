@@ -4,6 +4,7 @@ from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_core.documents import Document
 from langchain_openai import OpenAIEmbeddings
+from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from langchain_postgres import PGVector
 
 load_dotenv()
@@ -41,7 +42,14 @@ enriched = [
 ids = [f"doc-{i}" for i in range(len(enriched))]
 
 
-embeddings = OpenAIEmbeddings(model=os.getenv("OPENAI_MODEL", "text-embedding-3-small"))
+provider = os.getenv("ACTIVE_PROVIDER", "openai").lower()
+
+if provider == "openai":
+    embeddings = OpenAIEmbeddings(model=os.getenv("OPENAI_EMBEDDING_MODEL", "text-embedding-3-small"))
+elif provider == "gemini":
+    embeddings = GoogleGenerativeAIEmbeddings(model=os.getenv("GOOGLE_EMBEDDING_MODEL", "models/embedding-001"))
+else:
+    raise ValueError(f"Provedor {provider} não suportado.")
 
 store = PGVector(
     embeddings=embeddings,

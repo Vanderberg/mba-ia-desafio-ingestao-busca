@@ -1,8 +1,8 @@
 import os
 from dotenv import load_dotenv
-from langchain_openai import OpenAIEmbeddings
+from langchain_openai import OpenAIEmbeddings, ChatOpenAI
+from langchain_google_genai import GoogleGenerativeAIEmbeddings, ChatGoogleGenerativeAI
 from langchain_postgres import PGVector
-from langchain_openai import ChatOpenAI
 from langchain_core.prompts import PromptTemplate 
 from langchain_core.output_parsers import StrOutputParser
 
@@ -35,7 +35,16 @@ PERGUNTA DO USUÁRIO:
 RESPONDA A "PERGUNTA DO USUÁRIO"
 """
 
-embeddings = OpenAIEmbeddings(model=os.getenv("OPENAI_MODEL", "text-embedding-3-small"))
+provider = os.getenv("ACTIVE_PROVIDER", "openai").lower()
+
+if provider == "openai":
+    embeddings = OpenAIEmbeddings(model=os.getenv("OPENAI_EMBEDDING_MODEL", "text-embedding-3-small"))
+    llm = ChatOpenAI(model="gpt-5-nano", temperature=0.5)
+elif provider == "gemini":
+    embeddings = GoogleGenerativeAIEmbeddings(model=os.getenv("GOOGLE_EMBEDDING_MODEL", "models/embedding-001"))
+    llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash-lite", temperature=0.5)
+else:
+    raise ValueError(f"Provedor {provider} não suportado.")
 
 store = PGVector(
     embeddings=embeddings,
@@ -43,8 +52,6 @@ store = PGVector(
     connection=os.getenv("DATABASE_URL"),
     use_jsonb=True,
 )
-
-llm = ChatOpenAI(model="gpt-5-nano", temperature=0.5)
 
 prompt_do_rag = PromptTemplate(
     template=PROMPT_TEMPLATE,

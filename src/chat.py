@@ -1,5 +1,9 @@
+import os
 import time
+from dotenv import load_dotenv
 from search import search_prompt
+
+load_dotenv()
 
 # Códigos ANSI para cores no terminal
 RESET = "\033[0m"
@@ -10,8 +14,12 @@ YELLOW = "\033[93m"
 CYAN = "\033[96m"
 
 def cabecalho():
+    provider = os.getenv("ACTIVE_PROVIDER", "openai").lower()
+    model_name = "GPT-5 Nano (OpenAI)" if provider == "openai" else "Gemini 2.5 Flash Lite (Google)"
+    
     print(f"\n{CYAN}{BOLD}===================================================={RESET}")
     print(f"{CYAN}{BOLD}    Bem-vindo ao Assistente Virtual RAG-PDF    {RESET}")
+    print(f"{CYAN}{BOLD}    LLM Ativa: {CYAN}{BOLD}{model_name}{RESET}")
     print(f"{CYAN}{BOLD}===================================================={RESET}")
     print(f"{YELLOW}• Digite sua pergunta sobre o documento fornecido.{RESET}")
     print(f"{YELLOW}• Para encerrar a conversa, digite '{BOLD}sair{RESET}{YELLOW}'.{RESET}\n")
